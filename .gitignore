@@ -1,4 +1,8 @@
-.pdm.toml
-__pypackages__/
-build/
-dist/
+# Secrets and temp files
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.venv
+
+# Secrets
+.env

@@ -1,0 +1,13 @@
+runtime: python310
+# Ensure single-worker operation due to the hacks we have
+entrypoint: gunicorn -b :$PORT -w 1 -k uvicorn.workers.UvicornWorker main:app
+instance_class: F1
+app_engine_apis: true
+
+inbound_services:
+- mail
+
+automatic_scaling:
+  max_instances: 1
+
+env_variables:

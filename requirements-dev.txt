@@ -1,0 +1,8 @@
+pre-commit
+pytest
+pytest-cov
+isort
+black
+flake8
+pandas-stubs
+pip-tools
