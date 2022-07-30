@@ -11,21 +11,24 @@ from fastapi import FastAPI, Request
 from google.appengine.api import mail  # type: ignore
 from pydantic import BaseSettings, validator
 
+
 # Hack: install Java which is required for the PDF processing
-if shutil.which("java") is None:
-    print("Installing Java....")
-    import jdk  # type: ignore
+def java_setup_hack():
+    if shutil.which("java") is None:
+        java_path = Path().absolute() / "vendor" / "jre" / "bin"
+        if not os.path.exists(java_path):
+            print("Installing Java....")
+            import jdk  # type: ignore
 
-    try:
-        java_path = Path(jdk.install("11", jre=True)) / "bin"
-    except StopIteration:
-        jdk.uninstall("11", jre=True)
-        java_path = Path(jdk.install("11", jre=True)) / "bin"
+            try:
+                java_path = Path(jdk.install("11", jre=True)) / "bin"
+            except StopIteration:
+                jdk.uninstall("11", jre=True)
+                java_path = Path(jdk.install("11", jre=True)) / "bin"
 
-    os.environ["PATH"] = str(java_path) + ":" + os.environ["PATH"]
-    print(f"Java Path: {java_path}")
-    print("Installing Java: Done")
-# Hack: End
+        os.environ["PATH"] = str(java_path) + ":" + os.environ["PATH"]
+        print(f"Java Path: {java_path}")
+        print("Setting up Java: Done")
 
 
 def access_secret_version(project_id, secret_id, version_id):
@@ -67,6 +70,8 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
+
+java_setup_hack()
 
 settings = Settings()
 app = FastAPI()
