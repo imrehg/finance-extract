@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Huanan finance data handling
 """
 import logging
