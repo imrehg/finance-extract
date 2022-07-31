@@ -30,12 +30,11 @@ def handle_data(
     cleaned_transactions = huanan_df_cleanup(transactions)
     print(cleaned_transactions)
 
-    x = cleaned_transactions.to_gbq(
+    cleaned_transactions.to_gbq(
         destination_table=f"{bigquery_dataset}.{huanan_table_name}",
         if_exists="append",
         location=bigquery_location,
     )
-    print(x)
     logger.info("BigQuery upload finished.")
 
 

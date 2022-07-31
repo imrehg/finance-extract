@@ -7,9 +7,6 @@ from google.cloud import secretmanager
 # Adapted from the GCP docs/samples
 # https://github.com/googleapis/python-secret-manager/blob/83a03f6f82d82124591119095217cdff61556bee/samples/snippets/access_secret_version.py
 
-# Create the Secret Manager client.
-__secret_manager_client = secretmanager.SecretManagerServiceClient()
-
 
 def access_secret_version(project_id, secret_id, version_id):
     """
@@ -19,7 +16,10 @@ def access_secret_version(project_id, secret_id, version_id):
     # Build the resource name of the secret version.
     name = f"projects/{project_id}/secrets/{secret_id}/versions/{version_id}"
 
+    # Create the Secret Manager client.
+    secret_manager_client = secretmanager.SecretManagerServiceClient()
+
     # Access the secret version.
-    response = __secret_manager_client.access_secret_version(request={"name": name})
+    response = secret_manager_client.access_secret_version(request={"name": name})
     payload = response.payload.data.decode("UTF-8")
     return payload
