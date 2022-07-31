@@ -1,6 +1,6 @@
 runtime: python310
 # Ensure single-worker operation due to the hacks we have
-entrypoint: gunicorn -b :$PORT -w 1 -k uvicorn.workers.UvicornWorker main:app
+entrypoint: gunicorn -b :$PORT -w 1 -k uvicorn.workers.UvicornWorker --timeout 120 app.main:app
 instance_class: F1
 app_engine_apis: true
 

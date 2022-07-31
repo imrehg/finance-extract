@@ -13,20 +13,12 @@
 .git
 .gitignore
 
-# Python pycache:
-__pycache__/
-# Ignored by the build system
-/setup.cfg
-
-# Other not-used locations
-.venv/
-build/
-dist/
-infra/
-
 # Ignore everything, except the default parts
 /[!.]*
 /.?*
 !app.yaml
-!main.py
+# The whole set of application files
+!app/
 !requirements.txt
+# Ignore cache again
+__pycache__
