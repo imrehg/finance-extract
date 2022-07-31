@@ -30,27 +30,35 @@ def handle_data(
     cleaned_transactions = huanan_df_cleanup(transactions)
     print(cleaned_transactions)
 
-    cleaned_transactions.to_gbq(
-        destination_table=f"{bigquery_dataset}.{huanan_table_name}",
-        if_exists="append",
-        location=bigquery_location,
-    )
+    # cleaned_transactions.to_gbq(
+    #     destination_table=f"{bigquery_dataset}.{huanan_table_name}",
+    #     if_exists="append",
+    #     location=bigquery_location,
+    # )
     logger.info("BigQuery upload finished.")
 
 
 def huanan_extract_table_from_pdf(input_pdf, pdf_pass: str):
     pdf = pdfplumber.open(input_pdf, password=pdf_pass)
     page0 = pdf.pages[0]
-    table = page0.extract_table()
+    tables: list[list[list[str]]] = page0.extract_tables()
 
-    # Small QA
-    if len(table) < 2:
-        raise ValueError(f"Extracted table is not the expected size: {table}")
+    # Find the right table as there are multiple ones in the doc.
+    found_table = None
+    for table in tables:
+        # Check the first row first cell for the expected header
+        if table[0][0] == "卡片後四碼":
+            found_table = table
 
-    if table[0][0] != "卡片後四碼":
-        raise AttributeError(f"Haven't found correct table header: {table[0]}")
+            # Small QA
+            if len(found_table) < 2:
+                raise ValueError(f"Extracted table is not the expected size: {found_table}")
 
-    return pd.DataFrame(table[1:], columns=table[0])
+    if found_table is None:
+        logger.error(f"No correct table found: {tables}")
+        raise AttributeError("Haven't found correct table header by the header.")
+
+    return pd.DataFrame(found_table[1:], columns=found_table[0])
 
 
 def huanan_df_cleanup(df_in):
