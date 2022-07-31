@@ -3,6 +3,7 @@ import logging
 
 from fastapi import FastAPI, HTTPException, Request
 from google.appengine.api import mail  # type: ignore
+from google.auth.exceptions import DefaultCredentialsError
 from pydantic import BaseSettings, validator
 
 from .adapters import huanan
@@ -14,7 +15,7 @@ logger = logging.getLogger("uvicorn.error")
 
 
 class Settings(BaseSettings):
-    google_cloud_project: str
+    google_cloud_project: str = "dummy-project"
     huanan_pass: str = ""
     bigquery_location: str = "asia-east1"
     bigquery_dataset: str = "finance"
@@ -23,7 +24,10 @@ class Settings(BaseSettings):
     @validator("huanan_pass")
     def load_from_secrets_if_missing(cls, v, values):
         if v == "":
-            v = gcp.access_secret_version(values["google_cloud_project"], "huanan_pass", "latest")
+            try:
+                v = gcp.access_secret_version(values["google_cloud_project"], "huanan_pass", "latest")
+            except DefaultCredentialsError:
+                logger.warning("huanan_pass setting is empty")
         return v
 
     class Config:
