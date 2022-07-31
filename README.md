@@ -1,5 +1,7 @@
 # Finance Extractor
 
+[![Application](https://github.com/imrehg/finance-extract/actions/workflows/app.yaml/badge.svg)](https://github.com/imrehg/finance-extract/actions/workflows/app.yaml)
+
 A small data processing tool to extract finance data from emails.
 
 It is to support handling financial data that is received e.g.

@@ -15,7 +15,7 @@ logger = logging.getLogger("uvicorn.error")
 
 
 class Settings(BaseSettings):
-    google_cloud_project: str
+    google_cloud_project: str = "dummy-project"
     huanan_pass: str = ""
     bigquery_location: str = "asia-east1"
     bigquery_dataset: str = "finance"
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
         if v == "":
             try:
                 v = gcp.access_secret_version(values["google_cloud_project"], "huanan_pass", "latest")
-            except (KeyError, DefaultCredentialsError):
+            except DefaultCredentialsError:
                 logger.warning("huanan_pass setting is empty")
         return v
 
