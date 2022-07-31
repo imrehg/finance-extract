@@ -26,7 +26,7 @@ class Settings(BaseSettings):
         if v == "":
             try:
                 v = gcp.access_secret_version(values["google_cloud_project"], "huanan_pass", "latest")
-            except DefaultCredentialsError:
+            except (KeyError, DefaultCredentialsError):
                 logger.warning("huanan_pass setting is empty")
         return v
 
