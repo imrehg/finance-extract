@@ -1,8 +1,51 @@
 # -*- coding: utf-8 -*-
 """Huanan adapter related tests."""
+from pathlib import Path
+
 import pandas as pd
+import pytest
 
 from app.adapters import huanan
+
+
+@pytest.mark.parametrize(
+    "input_pdf_name,expected",
+    [
+        pytest.param(
+            "test00.pdf",
+            pd.DataFrame(
+                {
+                    "卡片後四碼": ["2109", "2109"],
+                    "消費日": ["2022/07/29 08:54", "2022/07/29 20:33"],
+                    "消費金額(新台幣)": ["404", "1,056"],
+                    "交易類別": ["1", "1"],
+                    "卡片名稱": ["ｉ網購生活卡城市星空", "ｉ網購生活卡城市星空"],
+                    "正卡/附卡": ["正卡", "正卡"],
+                }
+            ),
+        ),
+        pytest.param(
+            "test01.pdf",
+            pd.DataFrame(
+                {
+                    "卡片後四碼": ["2109"],
+                    "消費日": ["2022/07/25 12:16"],
+                    "消費金額(新台幣)": ["60"],
+                    "交易類別": ["1"],
+                    "卡片名稱": ["ｉ網購生活卡城市星空"],
+                    "正卡/附卡": ["正卡"],
+                }
+            ),
+        ),
+    ],
+)
+def test_huanan_table_extraction(input_pdf_name, expected):
+    """When a PDF is passed in, the correct dataframe content is extracted."""
+    assets_path = Path(__file__).parent / "assets"
+    test_pdf_path = assets_path / input_pdf_name
+    df_extracted = huanan.huanan_extract_table_from_pdf(test_pdf_path, pdf_pass="Hello")
+
+    assert df_extracted.equals(expected)
 
 
 def test_huanan_df_cleanup():
