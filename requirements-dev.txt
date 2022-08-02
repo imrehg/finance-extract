@@ -6,3 +6,4 @@ black
 flake8
 pandas-stubs
 pip-tools
+pytest-mock

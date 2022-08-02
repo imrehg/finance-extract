@@ -6,12 +6,18 @@ from io import BytesIO
 
 import pandas as pd
 import pdfplumber
+from pdfminer.pdfdocument import PDFPasswordIncorrect
 
 logger = logging.getLogger("uvicorn.error")
 
 
 def handle_data(
-    mail_message, pdf_pass: str, bigquery_dataset: str, huanan_table_name: str, bigquery_location: str
+    mail_message,
+    pdf_pass: str,
+    google_cloud_project: str,
+    bigquery_dataset: str,
+    huanan_table_name: str,
+    bigquery_location: str,
 ) -> None:
     try:
         # Get the first attachment
@@ -31,16 +37,23 @@ def handle_data(
     cleaned_transactions = huanan_df_cleanup(transactions)
     print(cleaned_transactions)
 
+    table = f"{bigquery_dataset}.{huanan_table_name}"
     cleaned_transactions.to_gbq(
-        destination_table=f"{bigquery_dataset}.{huanan_table_name}",
+        destination_table=table,
+        project_id=google_cloud_project,
         if_exists="append",
         location=bigquery_location,
     )
-    logger.info("BigQuery upload finished.")
+    logger.info(f"BigQuery upload finished: {table}")
 
 
 def huanan_extract_table_from_pdf(input_pdf, pdf_pass: str):
-    pdf = pdfplumber.open(input_pdf, password=pdf_pass)
+    try:
+        pdf = pdfplumber.open(input_pdf, password=pdf_pass)
+    except PDFPasswordIncorrect:
+        logging.error("PDF password was incorrect.")
+        raise AttributeError("PDF encryption passsword as incorrect.")
+
     page0 = pdf.pages[0]
     tables: list[list[list[str]]] = page0.extract_tables()
 
