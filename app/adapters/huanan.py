@@ -6,13 +6,14 @@ from io import BytesIO
 
 import pandas as pd
 import pdfplumber
+from google.appengine.api.mail import InboundEmailMessage
 from pdfminer.pdfdocument import PDFPasswordIncorrect
 
 logger = logging.getLogger("uvicorn.error")
 
 
 def handle_data(
-    mail_message,
+    mail_message: InboundEmailMessage,
     pdf_pass: str,
     google_cloud_project: str,
     bigquery_dataset: str,
@@ -35,7 +36,7 @@ def handle_data(
     encrypted_pdf = BytesIO(payload.decode())
     transactions = huanan_extract_table_from_pdf(encrypted_pdf, pdf_pass)
     cleaned_transactions = huanan_df_cleanup(transactions)
-    print(cleaned_transactions)
+    logger.info(cleaned_transactions)
 
     table = f"{bigquery_dataset}.{huanan_table_name}"
     cleaned_transactions.to_gbq(

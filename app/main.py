@@ -15,7 +15,7 @@ logger = logging.getLogger("uvicorn.error")
 
 
 class Settings(BaseSettings):
-    google_cloud_project: str = "dummy-project"
+    google_cloud_project: str = "default-project"
     huanan_pass: str = ""
     bigquery_location: str = "asia-east1"
     bigquery_dataset: str = "finance"
