@@ -18,7 +18,6 @@ def access_secret_version(project_id, secret_id, version_id):
 
     # Create the Secret Manager client.
     secret_manager_client = secretmanager.SecretManagerServiceClient()
-
     # Access the secret version.
     response = secret_manager_client.access_secret_version(request={"name": name})
     payload = response.payload.data.decode("UTF-8")

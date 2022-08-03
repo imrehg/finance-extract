@@ -76,3 +76,8 @@ def test_huanan_df_cleanup():
     df_cleaned = huanan.huanan_df_cleanup(df_in)
 
     assert df_cleaned.equals(df_expected)
+
+
+@pytest.mark.skip("Not yet written.")
+def test_handle_data():
+    pass

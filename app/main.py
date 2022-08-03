@@ -15,7 +15,7 @@ logger = logging.getLogger("uvicorn.error")
 
 
 class Settings(BaseSettings):
-    google_cloud_project: str = "dummy-project"
+    google_cloud_project: str = "default-project"
     huanan_pass: str = ""
     bigquery_location: str = "asia-east1"
     bigquery_dataset: str = "finance"
@@ -63,6 +63,7 @@ async def receive_mail(address: str, request: Request):
                 huanan.handle_data(
                     mail_message,
                     pdf_pass=settings.huanan_pass,
+                    google_cloud_project=settings.google_cloud_project,
                     bigquery_dataset=settings.bigquery_dataset,
                     huanan_table_name=settings.huanan_table_name,
                     bigquery_location=settings.bigquery_location,
@@ -70,5 +71,6 @@ async def receive_mail(address: str, request: Request):
             except BaseException as e:
                 raise HTTPException(status_code=422, detail=str(e))
         case _:
-            print(f"Can't handle request type: {organisation}")
+            logging.warning(f"Can't handle request type: {organisation}")
+            raise HTTPException(status_code=422, detail=f"Can't handle request type: {organisation}")
     return "Success"
